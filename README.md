@@ -1,27 +1,28 @@
 To start off, clone this branch of the repo into your local:
 
-```bash
+```shell
 git clone https://github.com/aL0NEW0LF/multilayer-perceptron-py
 ```
 
 After cloning the project, create your virutal environment:
-```bash
+
+```shell
 cd multilayer-perceptron-py
 ```
 
-```bash
+```shell
 py -3 -m venv .venv
 ```
 
 The, activate the env:
 
-```bash
+```shell
 .venv\Scripts\activate
 ```
 
 You can run the following command to install the dependencies:
 
-```bash
+```shell
 pip3 install -r requirements.txt
 ```
 
