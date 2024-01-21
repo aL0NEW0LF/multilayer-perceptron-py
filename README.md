@@ -37,3 +37,7 @@ Then you are good to go.
 > # TODO
 >
 > - [ ] Implement it _KEKW_
+
+# Contributing guidelines
+
+To contribute, see [contributing guidelines][contributing].
