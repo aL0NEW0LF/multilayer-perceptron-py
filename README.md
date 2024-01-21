@@ -40,4 +40,4 @@ Then you are good to go.
 
 # Contributing guidelines
 
-To contribute, see [contributing guidelines][contributing].
+To contribute, see [contributing guidelines](contributing).
