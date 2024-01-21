@@ -1,3 +1,7 @@
+# Multilayer perceptron - Academic project
+
+A multilayer perceptron implementation in Python.
+
 To start off, clone this branch of the repo into your local:
 
 ```shell
