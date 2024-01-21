@@ -9,7 +9,7 @@ To contribute to the project, you should open a pull request, but before you sub
    ```
 
 2. Commit your changes using a descriptive commit message that follows
-   [commit message conventions](#commit). Adherence to these conventions
+   [commit message conventions](https://github.com/angular/angular/blob/22b96b96902e1a42ee8c5e807720424abad3082a/CONTRIBUTING.md#-commit-message-guidelines). Adherence to these conventions
    is preferred.
 
    ```shell
@@ -46,7 +46,7 @@ from the main (upstream) repository:
 - Delete the remote branch on GitHub either through the GitHub web UI or your local shell as follows:
 
   ```shell
-  git push origin --delete my-fix-branch
+  git push origin --delete <my-fix/feat-branch>
   ```
 
 - Check out the main branch:
@@ -58,7 +58,7 @@ from the main (upstream) repository:
 - Delete the local branch:
 
   ```shell
-  git branch -D my-fix-branch
+  git branch -D <my-fix/feat-branch>
   ```
 
 - Update your main with the latest upstream version:
