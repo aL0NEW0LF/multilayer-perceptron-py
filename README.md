@@ -1,10 +1,13 @@
 To start off, clone this branch of the repo into your local:
 
 ```bash
-git clone https://github.com/aL0NEW0LF/data-playground-desktop
+git clone https://github.com/aL0NEW0LF/multilayer-perceptron-py
 ```
 
 After cloning the project, create your virutal environment:
+```bash
+cd multilayer-perceptron-py
+```
 
 ```bash
 py -3 -m venv .venv
