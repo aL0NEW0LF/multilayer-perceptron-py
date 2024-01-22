@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder 
 
 class MultiLayerPerceptron(BaseEstimator, ClassifierMixin): 
-    def __init__(self, params={'InputLayer': 4, 'HiddenLayer': 5, 'OutputLayer': 3, 'LearningRate': 0.005, 'Epochs': 600, 'BiasHiddenValue': -1, 'BiasOutputValue': -1, 'ActivationFunction': 'sigmoid'}):     
+    def __init__(self, params={'InputLayer': 4, 'HiddenLayer': 3, 'OutputLayer': 3, 'LearningRate': 0.005, 'Epochs': 600, 'BiasHiddenValue': -1, 'BiasOutputValue': -1, 'ActivationFunction': 'sigmoid'}):     
         self.inputLayer = params['InputLayer']
         self.hiddenLayer = params['HiddenLayer']
         self.OutputLayer = params['OutputLayer']
         self.learningRate = params['LearningRate']
-        self.max_epochs = params['Epocas']
+        self.max_epochs = params['Epochs']
         self.BiasHiddenValue = params['BiasHiddenValue']
         self.BiasOutputValue = params['BiasOutputValue']
         self.activation = self.activationFunctions[params['ActivationFunction']]
@@ -35,7 +35,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
             }
     derivitives = {
             'sigmoid': (lambda x: x*(1-x)),
-            'tanh': (lambda x: 1-x**2),
+            'tanh': (lambda x: 1-(np.tanh(x))**2),
             'Relu': (lambda x: 1 * (x>0)),
             'softmax': (lambda x: x*(1-x))
             }
