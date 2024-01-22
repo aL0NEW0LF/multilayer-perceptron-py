@@ -14,14 +14,30 @@ After cloning the project, create your virutal environment:
 cd multilayer-perceptron-py
 ```
 
+**Windows**
+
 ```shell
 py -3 -m venv .venv
 ```
 
+**MacOS/Linus**
+
+```shell
+python3 -m venv .venv
+```
+
 The, activate the env:
+
+**Windows**
 
 ```shell
 .venv\Scripts\activate
+```
+
+**MacOS/Linus**
+
+```shell
+. .venv/bin/activate
 ```
 
 You can run the following command to install the dependencies:
@@ -32,11 +48,10 @@ pip3 install -r requirements.txt
 
 Then you are good to go.
 
-> [!NOTE]
->
-> # TODO
->
-> - [ ] Implement it _KEKW_
+# TODO
+
+- [ ] Implement it _KEKW_
+- [ ] Choose the number of hidden layers to have, choose the number of neurons in each hidden layer and activation function in each layer
 
 # Contributing guidelines
 
