@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder 
 
 class MultiLayerPerceptron(BaseEstimator, ClassifierMixin): 
-    def __init__(self, params={'InputLayer': 4, 'HiddenLayer': 3, 'OutputLayer': 3, 'LearningRate': 0.005, 'Epochs': 600, 'BiasHiddenValue': -1, 'BiasOutputValue': -1, 'ActivationFunction': 'sigmoid'}):     
+    def __init__(self, params={'InputLayer': 4, 'HiddenLayer': 3, 'OutputLayer': 3, 'LearningRate': 0.005, 'Epochs': 600, 'BiasHiddenValue': -1, 'BiasOutputValue': -1, 'ActivationFunction': 'sigmoid', 'ClassNumber': 3}):     
         self.inputLayer = params['InputLayer']
         self.hiddenLayer = params['HiddenLayer']
         self.OutputLayer = params['OutputLayer']
@@ -22,7 +22,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         self.WEIGHT_output = self.starting_weights(self.OutputLayer, self.hiddenLayer)
         self.BIAS_hidden = np.array([self.BiasHiddenValue for i in range(self.hiddenLayer)])
         self.BIAS_output = np.array([self.BiasOutputValue for i in range(self.OutputLayer)])
-        self.classes_number = 3 
+        self.classes_number = params['ClassNumber']
             
     def starting_weights(self, x, y):
         return [[2  * random.random() - 1 for i in range(x)] for j in range(y)]
@@ -104,7 +104,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         encoder = OneHotEncoder()
         encoder.fit(y.reshape(-1,1))
         while(count_epoch <= self.max_epochs):
-            for idx,inputs in enumerate(X): 
+            for idx, inputs in enumerate(X): 
                 self.output = np.zeros(self.classes_number)
                 'Stage 1 - (Forward Propagation)'
                 self.OUTPUT_L1 = self.activation((np.dot(inputs, self.WEIGHT_hidden) + self.BIAS_hidden.T))
@@ -130,9 +130,8 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
             W0.append(self.WEIGHT_hidden)
             W1.append(self.WEIGHT_output)
              
-                
             count_epoch += 1
-        """ self.show_err_graphic(error_array,epoch_array)
+        self.show_err_graphic(error_array,epoch_array)
         
         plt.plot(W0[0])
         plt.title('Weight Hidden update during training')
@@ -144,6 +143,6 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         plt.title('Weight Output update during training')
         plt.legend(['neuron1', 'neuron2', 'neuron3'])
         plt.ylabel('Value Weight')
-        plt.show() """
+        plt.show()
 
         return self
