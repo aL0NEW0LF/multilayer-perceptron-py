@@ -26,7 +26,7 @@ py -3 -m venv .venv
 python3 -m venv .venv
 ```
 
-The, activate the env:
+Then, activate the env:
 
 **Windows**
 
