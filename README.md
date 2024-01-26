@@ -51,7 +51,9 @@ Then you are good to go.
 # TODO
 
 - [ ] Implement it _KEKW_
-- [ ] Choose the number of hidden layers to have, choose the number of neurons in each hidden layer and activation function in each layer
+- [X] Choose the number of hidden layers to have, choose the number of neurons in each hidden layer and activation function in each layer
+- [ ] Figure out why the testing results are bad (Somewhere in weight or error computing probably, or initialization)
+- [ ] Fix the `RuntimeWarning: overflow encountered in exp` bug/runtime-error
 
 # Contributing guidelines
 
