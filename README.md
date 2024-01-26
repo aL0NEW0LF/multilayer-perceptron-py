@@ -52,8 +52,13 @@ Then you are good to go.
 
 - [ ] Implement it _KEKW_
 - [X] Choose the number of hidden layers to have, choose the number of neurons in each hidden layer and activation function in each layer
-- [ ] Figure out why the testing results are bad (Somewhere in weight or error computing probably, or initialization)
-- [ ] Fix the `RuntimeWarning: overflow encountered in exp` bug/runtime-error
+- [ ] Fix the `RuntimeWarning: overflow encountered in exp` bug/runtime-error. (Somewhere in weight or error computing probably, or initialization, or some wrong sign) 
+    Its the Exploding Gradients problem.
+    An error gradient is the direction and magnitude obtained during neural network training and used to update network weights in the appropriate direction and quantity.
+
+    Error gradients in deep or recurrent neural networks can collect during an update, resulting in extremely high gradients. These causes significant modifications to the network weights, resulting in an unstable network. Weight values can get so big that they overflow, resulting in NaN values.
+
+    The explosion happens as a result of exponential growth, which is achieved by continuously multiplying gradients with values greater than 1.0 across network layers.
 
 # Contributing guidelines
 
