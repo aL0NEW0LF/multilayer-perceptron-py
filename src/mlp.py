@@ -15,7 +15,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         self.BiasHiddenValue = params['BiasHiddenValue']
         self.BiasOutputValue = params['BiasOutputValue']
         self.activation = self.activationFunctions[params['ActivationFunction']]
-        self.deriv = self.derivitives[params['ActivationFunction']]
+        self.derivative = self.derivatives[params['ActivationFunction']]
         
         'Starting Bias and Weights'
         self.WEIGHT_hidden = self.starting_weights(self.hiddenLayer, self.inputLayer)
@@ -33,7 +33,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
             'Relu': (lambda x: x*(x > 0)),
             'softmax': (lambda x: np.exp(x) / np.sum(np.exp(x), axis=0))
             }
-    derivitives = {
+    derivatives = {
             'sigmoid': (lambda x: x*(1-x)),
             'tanh': (lambda x: 1-(np.tanh(x))**2),
             'Relu': (lambda x: 1 * (x>0)),
@@ -44,7 +44,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         DELTA_output = []
         'Stage 1 - Error: OutputLayer'
         ERROR_output = self.output - self.OUTPUT_L2
-        DELTA_output = ((-1)*(ERROR_output) * self.deriv(self.OUTPUT_L2))
+        DELTA_output = ((-1)*(ERROR_output) * self.derivative(self.OUTPUT_L2))
         
         arrayStore = []
         'Stage 2 - Update weights OutputLayer and HiddenLayer'
@@ -54,7 +54,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
                 self.BIAS_output[j] -= (self.learningRate * DELTA_output[j])
       
         'Stage 3 - Error: HiddenLayer'
-        delta_hidden = np.matmul(self.WEIGHT_output, DELTA_output)* self.deriv(self.OUTPUT_L1)
+        delta_hidden = np.matmul(self.WEIGHT_output, DELTA_output) * self.derivative(self.OUTPUT_L1)
  
         'Stage 4 - Update weights HiddenLayer and InputLayer(x)'
         for i in range(self.OutputLayer):
@@ -88,7 +88,7 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         dataframe = pd.DataFrame(array_score, columns=['_id', 'output', 'hoped_output'])
         return my_predictions, dataframe
 
-    def accuracyScore(self, y, y_pred):
+    def accuracy_score(self, y, y_pred):
         'Returns the accuracy between the true labels and the predictions'
         return np.round(np.sum(y == y_pred) / len(y), 4)
 
