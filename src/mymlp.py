@@ -72,7 +72,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         print('DELTA_output length: ', len(DELTA_output)) """
 
         'Stage 3 - Error: HiddenLayer' 
-        delta_hidden = [np.matmul(self.WEIGHT_output[i], DELTA_output) * self.derivative[i](self.OUTPUT_L1[i]) for i in range(len(self.hiddenLayerSizes))]
+        DELTA_hidden = [np.matmul(self.WEIGHT_output[i], DELTA_output) * self.derivative[i](self.OUTPUT_L1[i]) for i in range(len(self.hiddenLayerSizes))]
         
         'Stage 4 - Update weights HiddenLayer and InputLayer(x)'
         for i in range(self.OutputLayer):
@@ -86,8 +86,8 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                     print('self.WEIGHT_hidden length: ', len(self.WEIGHT_hidden))
                     print('self.BIAS_hidden: ', self.BIAS_hidden)
                     print('self.BIAS_hidden length: ', len(self.BIAS_hidden)) """
-                    self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (delta_hidden[j][k] * x[i]))
-                    self.BIAS_hidden[j][k] -= (self.learningRate * delta_hidden[j][k])
+                    self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (DELTA_hidden[j][k] * x[i]))
+                    self.BIAS_hidden[j][k] -= (self.learningRate * DELTA_hidden[j][k])
                     """ print('After------------------------------------------------------------------')
                     print('self.WEIGHT_hidden: ', self.WEIGHT_hidden)
                     print('self.WEIGHT_hidden length: ', len(self.WEIGHT_hidden))
@@ -98,7 +98,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         plt.figure(figsize=(9,4))
         plt.plot(epochs, error, "m-",color="b", marker=11)
         plt.xlabel("Number of Epochs")
-        plt.ylabel("Squared error (MSE) ")
+        plt.ylabel("Squared error (MSE)")
         plt.title("Error Minimization")
         plt.show()
 
@@ -109,15 +109,12 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         forward = []
         for i in range(len(self.hiddenLayerSizes)):
             if i == 0:
-                print('X length: ', len(X))
-                print('self.WEIGHT_hidden[i]: ', self.WEIGHT_hidden[i])
-                print('self.WEIGHT_hidden[i] length: ', len(self.WEIGHT_hidden[i]))
-                print('self.BIAS_hidden: ', self.BIAS_hidden)
-                print('self.BIAS_hidden length: ', len(self.BIAS_hidden))
-                forward.append(np.matmul(X,self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
+                forward.append(np.matmul(X, self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
             else:
-                forward.append(np.matmul(forward[i-1],self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
-                                 
+                forward.append(np.matmul(forward[i-1], self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
+
+        forward.append(np.matmul(forward[-1], self.WEIGHT_output) + self.BIAS_output)    
+
         for i in forward[-1]:
             my_predictions.append(max(enumerate(i), key=lambda x:x[1])[0])
             
