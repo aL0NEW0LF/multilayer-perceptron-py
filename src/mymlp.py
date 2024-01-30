@@ -1,3 +1,4 @@
+from math import sqrt
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 import random
 import numpy as np
@@ -24,17 +25,48 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         'Starting Bias and Weights'
         for index, layerSize in enumerate(self.hiddenLayerSizes):
             if index == 0:
-                self.WEIGHT_hidden.append(self.starting_weights(layerSize, self.inputLayer))
+                if self.activation[index] == self.activationFunctions['sigmoid'] or self.activation[index] == self.activationFunctions['tanh'] or self.activation[index] == self.activationFunctions['softmax']:
+                    self.WEIGHT_hidden.append(self.starting_weights_sig_tanh(layerSize, self.inputLayer))
+                else:
+                    self.WEIGHT_hidden.append(self.starting_weights_relu(layerSize, self.inputLayer))
             else:
-                self.WEIGHT_hidden.append(self.starting_weights(layerSize, self.hiddenLayerSizes[index-1]))
+                if self.activation[index] == self.activationFunctions['sigmoid'] or self.activation[index] == self.activationFunctions['tanh'] or self.activation[index] == self.activationFunctions['softmax']:
+                    self.WEIGHT_hidden.append(self.starting_weights_sig_tanh(layerSize, self.hiddenLayerSizes[index-1]))
+                else:
+                    self.WEIGHT_hidden.append(self.starting_weights_relu(layerSize, self.hiddenLayerSizes[index-1]))
 
-        self.WEIGHT_output = self.starting_weights(self.OutputLayer, self.hiddenLayerSizes[-1])
+        if self.outputActivation == self.activationFunctions['sigmoid'] or self.outputActivation == self.activationFunctions['tanh'] or self.activation[index] == self.activationFunctions['softmax']:
+            self.WEIGHT_output = self.starting_weights_sig_tanh(self.OutputLayer, self.hiddenLayerSizes[-1])
+        else:
+            self.WEIGHT_output = self.starting_weights_relu(self.OutputLayer, self.hiddenLayerSizes[-1])
+
         self.BIAS_hidden = [[self.BiasHiddenValue for i in range(self.hiddenLayerSizes[j])] for j in range(len(self.hiddenLayerSizes))]
         self.BIAS_output = np.array([self.BiasOutputValue for i in range(self.OutputLayer)])
         self.classes_number = params['ClassNumber']
             
-    def starting_weights(self, x, y):
-        return [[2  * random.random() - 1 for i in range(x)] for j in range(y)]
+    def starting_weights_sig_tanh(self, x, y):
+        'Returns a matrix of weights with random values'
+        lower, upper = -(1.0 / sqrt(x)), (1.0 / sqrt(x))
+        initWeights = []
+        for i in range(y):
+            weightsList = []
+            for j in range(x):
+                random.seed(random.randint(0, x))
+                weightsList.append(random.uniform(lower, upper))
+            initWeights.append(weightsList)
+        return np.array(initWeights)
+    
+    def starting_weights_relu(self, x, y):
+        'Returns a matrix of weights with random values'
+        sigma = sqrt(2.0 / (x))
+        initWeights = []
+        for i in range(y):
+            weightsList = []
+            for j in range(x):
+                random.seed(random.randint(0, x))
+                weightsList.append(random.gauss(0, sigma))
+            initWeights.append(weightsList)
+        return np.array(initWeights)
 
     activationFunctions = {
             'sigmoid': (lambda x: 1/(1 + np.exp(-x)) if x.all() >= 0 else np.exp(x)/(1 + np.exp(x))),
@@ -92,7 +124,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                     print('self.WEIGHT_hidden[j][i][k]: ', self.WEIGHT_hidden[j][i][k])
                     print('self.BIAS_hidden: ', self.BIAS_hidden)
                     print('self.BIAS_hidden length: ', len(self.BIAS_hidden)) """
-                    self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (DELTA_hidden[j][k] * x[i]))
+                    self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (DELTA_hidden[j][k]))
                     self.BIAS_hidden[j][k] -= (self.learningRate * DELTA_hidden[j][k])
                     """ print('After------------------------------------------------------------------')
                     print('self.WEIGHT_hidden: ', self.WEIGHT_hidden)
@@ -118,7 +150,6 @@ class MyMlp(BaseEstimator, ClassifierMixin):
 
         forward.append(np.matmul(forward[-1], self.WEIGHT_output) + self.BIAS_output)
 
-        print('forward: ', forward) 
         print('forward[-1]: ', forward[-1])       
 
         for i in forward[-1]:
@@ -153,11 +184,11 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                 self.OUTPUT_L1 = []
                 for i in range(len(self.hiddenLayerSizes)):
                     if i == 0:
-                        self.OUTPUT_L1.append(self.activation[i](np.matmul(inputs, self.WEIGHT_hidden[i]) + self.BIAS_hidden[i]))
+                        self.OUTPUT_L1.append(self.activation[i](np.dot(inputs, self.WEIGHT_hidden[i]) + self.BIAS_hidden[i]))
                     else:
-                        self.OUTPUT_L1.append(self.activation[i](np.matmul(self.OUTPUT_L1[i-1],self.WEIGHT_hidden[i]) + self.BIAS_hidden[i]))
+                        self.OUTPUT_L1.append(self.activation[i](np.dot(self.OUTPUT_L1[i-1],self.WEIGHT_hidden[i]) + self.BIAS_hidden[i]))
 
-                self.OUTPUT_L2 = self.outputActivation(np.matmul(self.OUTPUT_L1[-1],self.WEIGHT_output))
+                self.OUTPUT_L2 = self.outputActivation(np.dot(self.OUTPUT_L1[-1],self.WEIGHT_output))
 
                 'One-Hot-Encoding'
                 self.output = np.array(encoder.transform(y[idx].reshape(-1,1)).toarray()).flatten()
@@ -177,14 +208,15 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                 error_array.append(total_error)
                 epoch_array.append(count_epoch)
                 
-            W0.append(self.WEIGHT_hidden)
-            W1.append(self.WEIGHT_output)
+            W0.append(list(self.WEIGHT_hidden))
+            W1.append(list(self.WEIGHT_output))
              
             count_epoch += 1
 
         print('Model fitted.')
-                
-        """ self.show_err_graphic(error_array,epoch_array) """
+        """ print('W0: ', W0)
+        print('W1: ', W1) """
+        self.show_err_graphic(error_array,epoch_array)
         
         """ plt.plot(W0[0])
         plt.title('Weight Hidden update during training')
@@ -199,3 +231,11 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         plt.show() """
 
         return self
+    
+    def show_err_graphic(self,v_erro,v_epoca):
+        plt.figure(figsize=(9,4))
+        plt.plot(v_epoca, v_erro, "m-",color="b", marker=11)
+        plt.xlabel("Number of Epochs")
+        plt.ylabel("Squared error (MSE) ")
+        plt.title("Error Minimization")
+        plt.show()
