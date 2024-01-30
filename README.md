@@ -50,9 +50,9 @@ Then you are good to go.
 
 # TODO
 
-- [ ] Implement it _KEKW_
+- [X] Implement it _KEKW_
 - [X] Choose the number of hidden layers to have, choose the number of neurons in each hidden layer and activation function in each layer
-- [ ] Fix the `RuntimeWarning: overflow encountered in exp` bug/runtime-error. (Somewhere in weight or error computing probably, or initialization, or some wrong sign) 
+- [X] Fix the `RuntimeWarning: overflow encountered in exp` bug/runtime-error. (Somewhere in weight or error computing probably, or initialization, or some wrong sign) 
 
     Its the Exploding Gradients problem.
     
