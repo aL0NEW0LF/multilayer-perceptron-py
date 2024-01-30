@@ -134,8 +134,14 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
             W1.append(self.WEIGHT_output)
              
             count_epoch += 1
+
+        print('Model fitted.')
+
         self.show_err_graphic(error_array,epoch_array)
         
+        print('W0: ', W0)
+        print('W1: ', W1)
+
         plt.plot(W0[0])
         plt.title('Weight Hidden update during training')
         plt.legend(['neuron1', 'neuron2', 'neuron3', 'neuron4', 'neuron5'])
