@@ -51,14 +51,14 @@ class MyMlp(BaseEstimator, ClassifierMixin):
  
     def back_propagation(self, x):
         DELTA_output = []
-        'Stage 1 - Error: OutputLayer'
+        'Error: OutputLayer'
         ERROR_output = self.output - self.OUTPUT_L2
         DELTA_output = ((-1)*(ERROR_output) * self.outputDerivative(self.OUTPUT_L2))
         
         arrayStore = []
-        'Stage 2 - Update weights OutputLayer and HiddenLayer'
-        for i in range(self.hiddenLayerSizes[-1]):
-            for j in range(self.OutputLayer):
+        'Update weights OutputLayer and HiddenLayer'
+        for j in range(self.OutputLayer):
+            for i in range(self.hiddenLayerSizes[-1]):
                 self.WEIGHT_output[i][j] -= (self.learningRate * (DELTA_output[j] * self.OUTPUT_L1[-1][i]))
                 self.BIAS_output[j] -= (self.learningRate * DELTA_output[j])
 
@@ -71,19 +71,25 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         print('DELTA_output: ', DELTA_output)
         print('DELTA_output length: ', len(DELTA_output)) """
 
-        'Stage 3 - Error: HiddenLayer' 
+        'Error: HiddenLayer' 
         DELTA_hidden = [np.matmul(self.WEIGHT_output[i], DELTA_output) * self.derivative[i](self.OUTPUT_L1[i]) for i in range(len(self.hiddenLayerSizes))]
         
-        'Stage 4 - Update weights HiddenLayer and InputLayer(x)'
-        for i in range(self.OutputLayer):
-            """ print('i: ', i) """
-            for j, layerSize in enumerate(reversed(self.hiddenLayerSizes)):
-                """ print('j: ', j) """
-                for k in range(layerSize):
-                    """ print('k: ', k)
+        'Update weights HiddenLayer and InputLayer(x)'
+        for j, layerSize in reversed(list(enumerate(self.hiddenLayerSizes))):
+            """ print('j: ', j)
+            print('layerSize: ', layerSize) """
+            for k in range(layerSize):
+                """ print('k: ', k) """
+                for i in range(self.hiddenLayerSizes[j-1] if j > 0 else self.inputLayer):
+                    """ print('i: ', i)
                     print('Before-----------------------------------------------------------------')
                     print('self.WEIGHT_hidden: ', self.WEIGHT_hidden)
                     print('self.WEIGHT_hidden length: ', len(self.WEIGHT_hidden))
+                    print('self.WEIGHT_hidden[j]: ', self.WEIGHT_hidden[j])
+                    print('self.WEIGHT_hidden[j] length: ', len(self.WEIGHT_hidden[j]))
+                    print('self.WEIGHT_hidden[j][i]: ', self.WEIGHT_hidden[j][i])
+                    print('self.WEIGHT_hidden[j][i] length: ', len(self.WEIGHT_hidden[j][i]))
+                    print('self.WEIGHT_hidden[j][i][k]: ', self.WEIGHT_hidden[j][i][k])
                     print('self.BIAS_hidden: ', self.BIAS_hidden)
                     print('self.BIAS_hidden length: ', len(self.BIAS_hidden)) """
                     self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (DELTA_hidden[j][k] * x[i]))
@@ -93,14 +99,6 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                     print('self.WEIGHT_hidden length: ', len(self.WEIGHT_hidden))
                     print('self.BIAS_hidden: ', self.BIAS_hidden)
                     print('self.BIAS_hidden length: ', len(self.BIAS_hidden)) """
-                
-    def show_err_graphic(self, error, epochs):
-        plt.figure(figsize=(9,4))
-        plt.plot(epochs, error, "m-",color="b", marker=11)
-        plt.xlabel("Number of Epochs")
-        plt.ylabel("Squared error (MSE)")
-        plt.title("Error Minimization")
-        plt.show()
 
     def predict(self, X, y):
         'Returns the predictions for every element of X'
@@ -109,11 +107,19 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         forward = []
         for i in range(len(self.hiddenLayerSizes)):
             if i == 0:
+                print('X length: ', len(X))
+                print('self.WEIGHT_hidden[i]: ', self.WEIGHT_hidden[i])
+                print('self.WEIGHT_hidden[i] length: ', len(self.WEIGHT_hidden[i]))
+                print('self.BIAS_hidden: ', self.BIAS_hidden)
+                print('self.BIAS_hidden length: ', len(self.BIAS_hidden))
                 forward.append(np.matmul(X, self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
             else:
                 forward.append(np.matmul(forward[i-1], self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
 
-        forward.append(np.matmul(forward[-1], self.WEIGHT_output) + self.BIAS_output)    
+        forward.append(np.matmul(forward[-1], self.WEIGHT_output) + self.BIAS_output)
+
+        print('forward: ', forward) 
+        print('forward[-1]: ', forward[-1])       
 
         for i in forward[-1]:
             my_predictions.append(max(enumerate(i), key=lambda x:x[1])[0])
@@ -143,7 +149,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         while(count_epoch <= self.max_epochs):
             for idx, inputs in enumerate(X): 
                 self.output = np.zeros(self.classes_number)
-                'Stage 1 - (Forward Propagation)'
+                '(Forward Propagation)'
                 self.OUTPUT_L1 = []
                 for i in range(len(self.hiddenLayerSizes)):
                     if i == 0:
@@ -153,7 +159,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
 
                 self.OUTPUT_L2 = self.outputActivation(np.matmul(self.OUTPUT_L1[-1],self.WEIGHT_output))
 
-                'Stage 2 - One-Hot-Encoding'
+                'One-Hot-Encoding'
                 self.output = np.array(encoder.transform(y[idx].reshape(-1,1)).toarray()).flatten()
 
                 square_error = 0

@@ -74,12 +74,15 @@ class MultiLayerPerceptron(BaseEstimator, ClassifierMixin):
         'Returns the predictions for every element of X'
         my_predictions = []
         'Forward Propagation'
-        forward = np.matmul(X,self.WEIGHT_hidden) + self.BIAS_hidden
+        forward = np.matmul(X, self.WEIGHT_hidden) + self.BIAS_hidden
         forward = np.matmul(forward, self.WEIGHT_output) + self.BIAS_output
-                                 
+
         for i in forward:
             my_predictions.append(max(enumerate(i), key=lambda x:x[1])[0])
-            
+
+        print('forward: ', forward) 
+        print('forward[-1]: ', forward[-1])
+
         array_score = []
         for i in range(len(my_predictions)):
             array_score.append([i, my_predictions[i], y[i]])
