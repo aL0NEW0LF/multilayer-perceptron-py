@@ -1,4 +1,5 @@
-from math import sqrt
+from math import inf, sqrt
+import sys
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 import random
 import numpy as np
@@ -43,7 +44,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         self.BIAS_hidden = [[self.BiasHiddenValue for i in range(self.hiddenLayerSizes[j])] for j in range(len(self.hiddenLayerSizes))]
         self.BIAS_output = np.array([self.BiasOutputValue for i in range(self.OutputLayer)])
         self.classes_number = params['ClassNumber']
-            
+
     def starting_weights_sig_tanh(self, x, y):
         'Returns a matrix of weights with random values'
         lower, upper = -(1.0 / sqrt(x)), (1.0 / sqrt(x))
@@ -81,6 +82,13 @@ class MyMlp(BaseEstimator, ClassifierMixin):
             'softmax': (lambda x: x*(1-x))
             }
  
+    def clip_gradients(self, gradients, max_value):
+        total_norm = np.sqrt(np.sum([np.sum(np.square(grad)) for grad in gradients]))
+        clip_coef = max_value / (total_norm + 1e-6)  # add small epsilon to prevent division by zero
+        if clip_coef < 1:
+            return [clip_coef * grad for grad in gradients]
+        return gradients
+    
     def back_propagation(self, x):
         DELTA_output = []
         'Error: OutputLayer'
@@ -94,18 +102,11 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                 self.WEIGHT_output[i][j] -= (self.learningRate * (DELTA_output[j] * self.OUTPUT_L1[-1][i]))
                 self.BIAS_output[j] -= (self.learningRate * DELTA_output[j])
 
-        """ print('self.WEIGHT_output: ', self.WEIGHT_output)
-        print('self.WEIGHT_output length: ', len(self.WEIGHT_output))
-        print('self.BIAS_output: ', self.BIAS_output)
-        print('self.BIAS_output length: ', len(self.BIAS_output))
-        print('ERROR_output: ', ERROR_output)
-        print('ERROR_output length: ', len(ERROR_output))
-        print('DELTA_output: ', DELTA_output)
-        print('DELTA_output length: ', len(DELTA_output)) """
-
         'Error: HiddenLayer' 
         DELTA_hidden = [np.matmul(self.WEIGHT_output[i], DELTA_output) * self.derivative[i](self.OUTPUT_L1[i]) for i in range(len(self.hiddenLayerSizes))]
         
+        DELTA_hidden = self.clip_gradients(DELTA_hidden, 1)
+
         'Update weights HiddenLayer and InputLayer(x)'
         for j, layerSize in reversed(list(enumerate(self.hiddenLayerSizes))):
             """ print('j: ', j)
@@ -117,11 +118,6 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                     print('Before-----------------------------------------------------------------')
                     print('self.WEIGHT_hidden: ', self.WEIGHT_hidden)
                     print('self.WEIGHT_hidden length: ', len(self.WEIGHT_hidden))
-                    print('self.WEIGHT_hidden[j]: ', self.WEIGHT_hidden[j])
-                    print('self.WEIGHT_hidden[j] length: ', len(self.WEIGHT_hidden[j]))
-                    print('self.WEIGHT_hidden[j][i]: ', self.WEIGHT_hidden[j][i])
-                    print('self.WEIGHT_hidden[j][i] length: ', len(self.WEIGHT_hidden[j][i]))
-                    print('self.WEIGHT_hidden[j][i][k]: ', self.WEIGHT_hidden[j][i][k])
                     print('self.BIAS_hidden: ', self.BIAS_hidden)
                     print('self.BIAS_hidden length: ', len(self.BIAS_hidden)) """
                     self.WEIGHT_hidden[j][i][k] -= (self.learningRate * (DELTA_hidden[j][k]))
@@ -139,11 +135,6 @@ class MyMlp(BaseEstimator, ClassifierMixin):
         forward = []
         for i in range(len(self.hiddenLayerSizes)):
             if i == 0:
-                print('X length: ', len(X))
-                print('self.WEIGHT_hidden[i]: ', self.WEIGHT_hidden[i])
-                print('self.WEIGHT_hidden[i] length: ', len(self.WEIGHT_hidden[i]))
-                print('self.BIAS_hidden: ', self.BIAS_hidden)
-                print('self.BIAS_hidden length: ', len(self.BIAS_hidden))
                 forward.append(np.matmul(X, self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
             else:
                 forward.append(np.matmul(forward[i-1], self.WEIGHT_hidden[i]) + self.BIAS_hidden[i])
@@ -188,7 +179,7 @@ class MyMlp(BaseEstimator, ClassifierMixin):
                     else:
                         self.OUTPUT_L1.append(self.activation[i](np.dot(self.OUTPUT_L1[i-1],self.WEIGHT_hidden[i]) + self.BIAS_hidden[i]))
 
-                self.OUTPUT_L2 = self.outputActivation(np.dot(self.OUTPUT_L1[-1],self.WEIGHT_output))
+                self.OUTPUT_L2 = self.outputActivation(np.dot(self.OUTPUT_L1[-1], self.WEIGHT_output) + self.BIAS_output)
 
                 'One-Hot-Encoding'
                 self.output = np.array(encoder.transform(y[idx].reshape(-1,1)).toarray()).flatten()
